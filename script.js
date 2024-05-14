@@ -60,19 +60,22 @@ const game = (() => {
         if (Gameboard.updateGameboard(squareSelect, nowPlaying.symbol)) {
           console.log('You chose: ' + squareSelect);
           console.log('Updated gameboard:', Gameboard.gameboard);
+
           //Verify game conditions
           if (checkWinner() || checkFullBoard()) {
+            //If the game already end you can choose to reset or finish it
             if (resetGame()) {
+              nowPlaying = playerX; //To start again with player X
             } else {
-              gameActive = false;
-              break;
+              gameActive = false; //Desactive the game
+              break; //End the game
             }
+          } else {
+            //Player change
+            nowPlaying === playerX
+              ? (nowPlaying = playerO)
+              : (nowPlaying = playerX);
           }
-
-          //Player change
-          nowPlaying === playerX
-            ? (nowPlaying = playerO)
-            : (nowPlaying = playerX);
         } else {
           console.log('Square already occupied. Try again');
         }
@@ -130,7 +133,6 @@ const game = (() => {
     } while (answer !== 'yes' && answer !== 'no');
     if (answer === 'yes') {
       Gameboard.resetGameboard();
-      nowPlaying = playerX;
       return true;
     } else {
       return false;
