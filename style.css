@@ -1,3 +1,95 @@
-* {
-  background-color: darkgray;
+@font-face {
+  font-family: 'gameovercre';
+  src: url('./fonts/gameovercre1.ttf') format('truetype');
+}
+
+body {
+  height: 100vh;
+  font-family: 'gameovercre';
+  background: rgb(163, 63, 51);
+  background: linear-gradient(
+    55deg,
+    rgba(163, 63, 51, 1) 0%,
+    rgba(145, 163, 70, 1) 16%,
+    rgba(70, 111, 163, 1) 100%
+  );
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+body .title > h1 {
+  color: #ff7f7f;
+  font-size: 3rem;
+}
+
+body .title > h2 {
+  color: #000000;
+  font-size: 2rem;
+}
+
+body .title > h3 {
+  color: #ffffff;
+  font-size: 1.5rem;
+}
+
+body .title > * {
+  margin: 5px;
+}
+
+.title {
+  margin: 20px auto;
+  text-align: center;
+}
+
+.game-status {
+  height: 30px;
+
+  text-align: center;
+  font-size: 1.7rem;
+  padding: 30px;
+}
+
+.gameboard {
+  width: 300px;
+  height: 300px;
+  display: grid;
+  grid-template: 1fr 1fr 1fr /1fr 1fr 1fr;
+  gap: 10px;
+  margin: auto;
+}
+
+.square {
+  background-color: black;
+  color: white;
+  font-size: 3rem;
+  text-align: center;
+  border: none;
+  border-radius: 5px;
+}
+
+.square:hover {
+  background-color: #443b39;
+}
+
+.new-game {
+  margin: 30px auto;
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  background-color: #ff7f7f;
+  font-size: 1rem;
+  font-family: 'gameovercre';
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: box-shadow 0.3s, background-color 0.3s;
+}
+
+.new-game:hover {
+  background-color: #ff5a5a;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.new-game:active {
+  background-color: #e64b4b;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }

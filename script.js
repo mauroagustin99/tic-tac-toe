@@ -1,8 +1,7 @@
 //IIFE for the gameboard
 const Gameboard = (() => {
-  //A 3x3 array
+  //A 3x3 array for the board
   let gameboard = Array(9).fill('');
-  console.log(gameboard);
 
   //Method to update the board
   const updateGameboard = (position, symbol) => {
@@ -17,8 +16,10 @@ const Gameboard = (() => {
   //Method to reset the board
   const resetGameboard = () => {
     //Change all array elements to ''
+
     for (let i = 0; i < gameboard.length; i++) {
       gameboard[i] = '';
+      console.log(gameboard);
     }
   };
 
@@ -44,44 +45,22 @@ const playerO = Player('O');
 const game = (() => {
   //First player is always X
   let nowPlaying = playerX;
+
   //Game active true until a winner or a draw
   let gameActive = true;
 
   //Principal PUBLIC game METHOD
   const playTurn = () => {
-    while (gameActive) {
-      console.log(nowPlaying);
-      let squareSelect = prompt('Choose a square (0-8): ');
-      squareSelect = parseInt(squareSelect);
-
-      if (!isNaN(squareSelect) && squareSelect >= 0 && squareSelect <= 8) {
-        //First game
-
-        if (Gameboard.updateGameboard(squareSelect, nowPlaying.symbol)) {
-          console.log('You chose: ' + squareSelect);
-          console.log('Updated gameboard:', Gameboard.gameboard);
-
-          //Verify game conditions
-          if (checkWinner() || checkFullBoard()) {
-            //If the game already end you can choose to reset or finish it
-            if (resetGame()) {
-              nowPlaying = playerX; //To start again with player X
-            } else {
-              gameActive = false; //Desactive the game
-              break; //End the game
-            }
-          } else {
-            //Player change
-            nowPlaying === playerX
-              ? (nowPlaying = playerO)
-              : (nowPlaying = playerX);
-          }
-        } else {
-          console.log('Square already occupied. Try again');
-        }
-      } else {
-        console.log('Invalid input');
+    if (gameActive) {
+      DOMcontroller.gameStatus(); //Draw Player turn status
+      DOMcontroller.drawEvent(); //Draw nowPlaying symbol in the gameboard
+      console.log(Gameboard.gameboard);
+      if (checkWinner()) {
+        gameActive = false;
+      } else if (checkFullBoard()) {
+        gameActive = false;
       }
+    } else {
     }
   };
 
@@ -102,12 +81,14 @@ const game = (() => {
     ];
     for (let conditions of winningConditions) {
       const [a, b, c] = conditions;
+      let winnerSymbol;
       if (
         Gameboard.gameboard[a] !== '' &&
         Gameboard.gameboard[a] === Gameboard.gameboard[b] &&
         Gameboard.gameboard[a] === Gameboard.gameboard[c]
       ) {
-        alert(`Congratulatios! ${nowPlaying.symbol} wins!`);
+        winnerSymbol = Gameboard.gameboard[a];
+        DOMcontroller.gameWinner(winnerSymbol);
         return true; //There´s a winner
       }
     }
@@ -120,30 +101,104 @@ const game = (() => {
     let isFull = false;
     isFull = Gameboard.gameboard.every((element) => element !== '');
     if (isFull) {
-      alert('Its a draw! :(');
+      DOMcontroller.gameTie();
     }
     return isFull;
   };
 
-  const resetGame = () => {
-    let answer;
-    do {
-      answer = prompt('Do you want to play again? (yes / no)');
-      answer = answer ? answer.toLowerCase() : '';
-    } while (answer !== 'yes' && answer !== 'no');
-    if (answer === 'yes') {
-      Gameboard.resetGameboard();
-      return true;
-    } else {
-      return false;
-    }
+  const getNowPlaying = () => {
+    return nowPlaying;
   };
 
+  const getGameActive = () => {
+    return gameActive;
+  };
+
+  // Method to update the current player
+  const updateNowPlaying = (player) => {
+    nowPlaying = player;
+  };
+
+  const updateGameActive = (condition) => {
+    gameActive = condition;
+  };
   //Returning public method (function to play a turn)
   return {
+    checkWinner,
+    getNowPlaying,
+    nowPlaying,
     playTurn,
+    getGameActive,
+    updateNowPlaying,
+    updateGameActive,
+  };
+})();
+
+const DOMcontroller = (() => {
+  const statusText = document.querySelector('.game-status'); //Select status DOM element
+  const boardSquares = document.querySelectorAll('.square'); //Select square DOM element
+  const newGameBtn = document.querySelector('.new-game'); //Select new game button
+
+  const gameStatus = () => {
+    statusText.innerHTML = 'Player ' + game.nowPlaying.symbol + "'s turn";
+  };
+
+  const gameWinner = (winnerSymbol) => {
+    statusText.innerHTML = 'Player ' + winnerSymbol + "'s Wins!🎉🎉";
+  };
+
+  const gameTie = () => {
+    statusText.innerHTML = 'It´ a draw! :( 😟';
+  };
+
+  const symbolDrawer = (square) => {
+    const symbol = game.nowPlaying.symbol;
+    square.innerHTML = symbol;
+  };
+
+  const drawEvent = () => {
+    boardSquares.forEach((square) => {
+      square.addEventListener('click', () => {
+        const number = square.classList[1];
+        const position = parseInt(number) - 1; // Make square number to array index
+
+        if (Gameboard.updateGameboard(position, game.nowPlaying.symbol)) {
+          if (game.getGameActive()) {
+            symbolDrawer(square); // If the movement is valid, it will draw the symbol
+
+            game.nowPlaying = game.nowPlaying === playerX ? playerO : playerX;
+            game.playTurn();
+          } else {
+          }
+        } else {
+        }
+      });
+    });
+  };
+
+  const newGame = () => {
+    newGameBtn.addEventListener('click', () => {
+      Gameboard.resetGameboard(); // reset the gameboard array
+      boardSquares.forEach((square) => {
+        square.innerHTML = ''; //Fill the divs with blank content
+      });
+      game.updateGameActive(true); //Active the game again if it was unabled beacuse a winner or a tie
+      game.updateNowPlaying(playerX);
+      gameStatus();
+      drawEvent();
+    });
+  };
+
+  return {
+    newGame,
+    gameStatus,
+    gameWinner,
+    symbolDrawer,
+    drawEvent,
+    gameTie,
   };
 })();
 
 //Execute the game
 game.playTurn();
+DOMcontroller.newGame();
